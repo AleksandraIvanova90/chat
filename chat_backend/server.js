@@ -1,19 +1,9 @@
 const http = require('http');
 const Koa = require('koa');
+const WS = require('ws')
 const { koaBody } = require('koa-body');
 const app = new Koa();
 const router = require('./routers');
-
-// const allNicknames = [
-//   {
-//       id: 1232313,
-//       name: 'Тест1',
-//     },
-//     {
-//       id: 123434352313,
-//       name: 'Тест2',
-//     }
-// ];
 
 app.use(koaBody({
   urlencoded: true,
@@ -112,6 +102,27 @@ const server = http.createServer(app.callback());
 
 const port = process.env.PORT || 7070;
 
+const wsServer = new WS.Server({
+  server
+});
+
+const chat = ['welcome to our chat'];
+
+wsServer.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    chat.push(message);
+
+    const eventData = JSON.stringify({ chat: [message] });
+
+    Array.from(wsServer.clients)
+      .filter(client => client.readyState === WS.OPEN)
+      .forEach(client => client.send(eventData));
+  });
+
+    ws.send(JSON.stringify({ chat }));
+});
+
+
 server.listen(port, (err) => {
   if (err) {
     console.log(err);
@@ -121,5 +132,6 @@ server.listen(port, (err) => {
 
   console.log('Server is listening to ' + port);
 });
+
 
 

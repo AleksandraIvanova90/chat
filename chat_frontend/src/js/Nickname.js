@@ -13,7 +13,7 @@ export default class Nickname {
       this.element.addEventListener("click", this.addNickname);
     }
 
-    addNickname(e) {
+    async addNickname(e) {
         e.preventDefault();
         if (!e.target.classList.contains("form-button")) return;
         
@@ -23,7 +23,7 @@ export default class Nickname {
             name: nick,
         }
         this.fetchData(data)
-       
+    
         
     }
 
@@ -76,7 +76,8 @@ export default class Nickname {
       console.log(result)
       if (result.ok) {
         this.element.remove()
-        this.openChat()
+        const dd = document.querySelector('.chat-container')
+        dd.classList.remove('plug')
         
       } else {
         alert("Такой псевдоним уже существует!")
